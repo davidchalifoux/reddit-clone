@@ -1,9 +1,9 @@
 <template>
   <div class="container pt-4" style="max-width: 45rem;">
     <h1>Home</h1>
-    <CreatePost/>
+    <CreatePost />
     <div v-if="loading">
-      <PlaceholderPost/>
+      <PlaceholderPost />
     </div>
     <PostListItem v-for="post in posts" v-bind:key="post.id" v-bind:post="post"></PostListItem>
   </div>
@@ -43,14 +43,13 @@ export default {
       this.error = this.posts = null
       this.loading = true
 
-      function getFullData (item) {
-        return { ...{ id: item.id }, ...item.data() }
-      }
-
       db.collection('posts').orderBy('date', 'desc')
-        .get()
-        .then(querySnapshot => {
-          this.posts = querySnapshot.docs.map(doc => getFullData(doc))
+        .onSnapshot((snapshot) => {
+          const posts = []
+          snapshot.forEach((doc) => {
+            posts.push({ id: doc.id, ...doc.data() })
+          })
+          this.posts = posts
           this.loading = false
         })
     }

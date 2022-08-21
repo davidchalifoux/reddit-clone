@@ -105,7 +105,6 @@ export default {
   },
   methods: {
     fetchData () {
-      let that = this
       this.error = null
       this.post = null
       this.loading = true
@@ -115,26 +114,23 @@ export default {
       }
 
       db.collection('posts').doc(this.$route.params.postid)
-        .get()
-        .then(function (doc) {
+        .onSnapshot((doc) => {
           if (doc.exists) {
-            that.post = doc.data()
-            that.loading = false
+            this.post = doc.data()
+            this.loading = false
           } else {
             // doc.data() will be undefined in this case
-            that.error = 'No such post'
+            this.error = 'No such post'
           }
         })
-        .catch(function (error) {
-          that.error = error
-        })
+
       db.collection('posts').doc(this.$route.params.postid).collection('comments').orderBy('date', 'desc')
         .get()
         .then(querySnapshot => {
           const documents = querySnapshot.docs.map(doc => getFullData(doc))
-          that.comments = documents
+          this.comments = documents
           if (documents.length < 1) {
-            that.comments = null
+            this.comments = null
           }
         })
     },
